@@ -1,3 +1,4 @@
+OUTPUT_FORMAT(pei-i386)
 ENTRY(loader)
 SECTIONS {
 
