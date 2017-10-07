@@ -1,0 +1,35 @@
+     1                                  global loader
+     2                                  extern kmain
+     3                                  
+     4                                  MODULEALIGN equ 1<<0
+     5                                  MEMINFO equ 1<<1
+     6                                  FLAGS equ MODULEALIGN | MEMINFO
+     7                                  MAGIC equ 0x1BADB002
+     8                                  CHECKSUM equ -(MAGIC + FLAGS)
+     9                                  
+    10                                  section .text
+    11                                  align 4
+    12                                  MultiBootHeader:
+    13 00000000 02B0AD1B                	dd MAGIC
+    14 00000004 03000000                	dd FLAGS
+    15 00000008 FB4F52E4                	dd CHECKSUM
+    16                                  	
+    17                                  STACKSIZE equ 0x4000
+    18                                  
+    19                                  loader:
+    20 0000000C 66BC[00400000]          	mov esp, stack + STACKSIZE
+    21 00000012 6650                    	push eax
+    22 00000014 6653                    	push ebx
+    23                                  	
+    24 00000016 E8(0000)                	call kmain
+    24          ******************       error: binary output format does not support external references
+    25 00000019 FA                      	cli
+    26                                  	
+    27                                  hang:
+    28 0000001A F4                      	hlt
+    29 0000001B EBFD                    	jmp hang
+    30                                  	
+    31                                  section .bss
+    32                                  align 4
+    33                                  stack:
+    34 00000000 <res 00004000>          resb STACKSIZE

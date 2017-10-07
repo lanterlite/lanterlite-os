@@ -1,0 +1,43 @@
+     1                                  	BITS 16
+     2                                  
+     3                                  start:
+     4 00000000 B8C007                  	mov ax, 07C0h						; Set up 4K stack space after this bootloader
+     5 00000003 052001                  	add ax, 288							; (4096 + 512) / 16 bytes per paragraph
+     6 00000006 8ED0                    	mov ss, ax
+     7 00000008 BC0010                  	mov sp, 4096
+     8                                  
+     9 0000000B B8C007                  	mov ax, 07C0h						; Set data segment to where we're loaded
+    10 0000000E 8ED8                    	mov ds, ax
+    11                                  
+    12 00000010 BE[1600]                	mov si, text_string					; Put string position into SI
+    13 00000013 E82B00                  	call print_string					; Call our string-printing routine
+    14                                  
+    15 00000016 4C616E7465726E734C-     	text_string db 'LanternsLanternsLanternsLanternsLanterns', 0
+    15 0000001F 616E7465726E734C61-
+    15 00000028 6E7465726E734C616E-
+    15 00000031 7465726E734C616E74-
+    15 0000003A 65726E7300         
+    16                                  
+    17 0000003F EBFE                    	jmp $								; Jump here - infinite loop!
+    18                                  
+    19                                  print_string:							; Routine: output string in SI to screen
+    20 00000041 B40E                    	mov ah, 0Eh							; int 10h 'print char' function
+    21                                  	;int 10h							; int 10h 'print char' function
+    22                                  
+    23                                  .repeat:
+    24 00000043 AC                      	lodsb								; Get character from string
+    25 00000044 3C00                    	cmp al, 0
+    26 00000046 7404                    	je .done							; If char is zero, end of string
+    27 00000048 CD10                    	int 10h								; Otherwise, print it
+    28                                  ;	int 10h								; Otherwise, print it
+    29                                  ;	mov ah, 0
+    30                                  ;	int 16h
+    31                                  ;	int 10h								; Otherwise, print it
+    32 0000004A EBF7                    	jmp .repeat
+    33                                  
+    34                                  .done:
+    35 0000004C C3                      	ret
+    36                                  
+    37 0000004D 00<rept>                	times 510-($-$$) db 0				; Pad remainder of boot sector with 0s
+    38 000001FE 55AA                    	dw 0xAA55							; The standard PC boot signature
+    39                                  
